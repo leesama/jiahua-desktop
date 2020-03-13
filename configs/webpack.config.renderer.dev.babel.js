@@ -236,8 +236,8 @@ export default merge.smart(baseConfig, {
   },
   resolve: {
     alias: {
-      'react-dom': '@hot-loader/react-dom',
-      '@': path.resolve(__dirname, '../app')
+      '@': path.resolve(__dirname, '../app'),
+      'react-dom': '@hot-loader/react-dom'
     }
   },
   plugins: [

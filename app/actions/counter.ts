@@ -1,4 +1,4 @@
-import { GetState, Dispatch } from '../reducers/types';
+// import { Dispatch } from '../reducers/types';
 
 export const INCREMENT_COUNTER = 'INCREMENT_COUNTER';
 export const DECREMENT_COUNTER = 'DECREMENT_COUNTER';

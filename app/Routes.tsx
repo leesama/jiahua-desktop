@@ -1,16 +1,19 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
-import routes from './constants/routes.json';
 import App from './containers/App/App';
-import HomePage from './containers/HomePage';
-import CounterPage from './containers/CounterPage';
+import EquipmentAdd from './components/equipment-add/equipment-add';
+import EquipmentMannage from './components/equipment-mannage/equipment-mannage';
+import TagMannage from './components/tag-mannage';
+import TagAdd from './components/tag-add/tag-add';
 
 export default function Routes() {
   return (
     <App>
       <Switch>
-        <Route path={routes.COUNTER} component={CounterPage} />
-        <Route path={routes.HOME} component={HomePage} />
+        <Route path="/equipmentadd" component={EquipmentAdd} />
+        <Route path="/equipmentmannage" component={EquipmentMannage} />
+        <Route path="/tagmannage" component={TagMannage} />
+        <Route path="/tagadd" component={TagAdd} />
       </Switch>
     </App>
   );

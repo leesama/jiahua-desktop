@@ -29,23 +29,21 @@ export default class MenuBuilder {
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
-
     return menu;
   }
 
   setupDevelopmentEnvironment() {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
-
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
-          }
-        }
-      ]).popup({ window: this.mainWindow });
-    });
+    // this.mainWindow.webContents.on('context-menu', (_, props) => {
+    //   const { x, y } = props;
+    //   Menu.buildFromTemplate([
+    //     {
+    //       label: 'Inspect element',
+    //       click: () => {
+    //         this.mainWindow.webContents.inspectElement(x, y);
+    //       }
+    //     }
+    //   ]).popup({ window: this.mainWindow });
+    // });
   }
 
   buildDarwinTemplate() {
@@ -199,14 +197,15 @@ export default class MenuBuilder {
           {
             label: '&Open',
             accelerator: 'Ctrl+O'
-          },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              this.mainWindow.close();
-            }
           }
+
+          // {
+          //   label: '&Close',
+          //   accelerator: 'Ctrl+W',
+          //   click: () => {
+          //     this.mainWindow.close();
+          //   }
+          // }
         ]
       },
       {

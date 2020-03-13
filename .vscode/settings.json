@@ -12,7 +12,7 @@
 
   "javascript.validate.enable": false,
   "javascript.format.enable": false,
-  "typescript.validate.enable": false,
+  // "typescript.validate.enable": false,
   "typescript.format.enable": false,
 
   "search.exclude": {
@@ -29,5 +29,14 @@
     "test/**/__snapshots__": true,
     "yarn.lock": true,
     "*.{css,sass,scss,less}.d.ts": true
+  },
+  "files.exclude": {
+    "app/dist": true,
+    "app/node_modules": true,
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true
   }
 }

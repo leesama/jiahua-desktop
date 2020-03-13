@@ -9,11 +9,13 @@
  * `./app/main.prod.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Tray, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+// import TrayBuilder from './tray';
 
+let tray = null;
 export default class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -36,16 +38,6 @@ if (
   require('electron-debug')();
 }
 
-// const installExtensions = async () => {
-//   const installer = require('electron-devtools-installer');
-//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-//   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
-
-//   return Promise.all(
-//     extensions.map(name => installer.default(installer[name], forceDownload))
-//   ).catch(console.log);
-// };
-
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -63,10 +55,16 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    minWidth: 200,
+    minHeight: 200,
+    vibrancy: 'fullscreen-ui',
+    frame: false,
+    hasShadow: true,
     webPreferences:
       process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true'
         ? {
-            nodeIntegration: true
+            nodeIntegration: true,
+            scrollBounce: true
           }
         : {
             preload: path.join(__dirname, 'dist/renderer.prod.js')
@@ -95,10 +93,24 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
-
-  // Remove this if your app does not use auto updates
+  // 托盘
+  const trayPath = `${__dirname}/statics/icons/icon.png`;
+  tray = new Tray(trayPath);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: '关闭',
+      click: () => {
+        mainWindow?.close();
+      }
+    }
+  ]);
+  tray.on('click', () => {
+    mainWindow?.show();
+  });
+  tray.setToolTip('佳华设备管理系统');
+  tray.setContextMenu(contextMenu);
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
 };
 
 /**

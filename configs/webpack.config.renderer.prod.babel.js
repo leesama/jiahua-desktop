@@ -223,7 +223,12 @@ export default merge.smart(baseConfig, {
       }
     ]
   },
-
+  resolve: {
+    alias: {
+      // 'react-dom': '@hot-loader/react-dom',
+      '@': path.resolve(__dirname, '../app')
+    }
+  },
   optimization: {
     minimizer: process.env.E2E_BUILD
       ? []
