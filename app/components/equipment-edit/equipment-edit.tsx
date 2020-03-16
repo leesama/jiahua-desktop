@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Drawer,
   Form,
@@ -7,21 +7,47 @@ import {
   Row,
   Input,
   Select,
-  DatePicker
+  DatePicker,
+  message
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import FormEditDynamicFileds from '../common/form-edit-dynamic-fileds/form-edit-dynamic-fileds';
+import moment from 'moment';
+import { momentFormat } from '@/config';
 
 const { Option } = Select;
+
 const EquipmentEdit: React.FC<{
   equipmentInfo: TableItem;
-  equipmentAllInfo: TagItem[];
+  tagList: TagItem[];
   visible: boolean;
+  onConfirm: (data: TableItem) => Promise<boolean>;
   onClose: () => void;
-}> = ({ equipmentInfo, equipmentAllInfo, visible, onClose }) => {
+}> = ({ equipmentInfo, tagList, visible, onConfirm, onClose }) => {
+  console.log(equipmentInfo, -11);
+
+  /**
+   * 如果 onConfirm返回值为真，关闭编辑面板
+   * @param data 修改后的数据
+   */
+  const onFinsh = async (data: TableItem) => {
+    // const isOk = await createEquipment(data);
+    // if (isOk) {
+    //   message.success('设备添加成功');
+    //   return true;
+    // } else {
+    //   message.error('设备添加失败');
+    //   return false;
+    // }
+    const isOk = await onConfirm(data);
+    if (isOk) {
+      onClose();
+    }
+  };
   return (
     <Drawer
       title="修改设备信息"
-      width={720}
+      width={1100}
       onClose={onClose}
       visible={visible}
       bodyStyle={{ paddingBottom: 80 }}
@@ -36,105 +62,13 @@ const EquipmentEdit: React.FC<{
         </div>
       }
     >
-      <Form layout="vertical" hideRequiredMark>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: 'Please enter user name' }]}
-            >
-              <Input placeholder="Please enter user name" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="url"
-              label="Url"
-              rules={[{ required: true, message: 'Please enter url' }]}
-            >
-              <Input
-                style={{ width: '100%' }}
-                addonBefore="http://"
-                addonAfter=".com"
-                placeholder="Please enter url"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="owner"
-              label="Owner"
-              rules={[{ required: true, message: 'Please select an owner' }]}
-            >
-              <Select placeholder="Please select an owner">
-                <Option value="xiao">Xiaoxiao Fu</Option>
-                <Option value="mao">Maomao Zhou</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="type"
-              label="Type"
-              rules={[{ required: true, message: 'Please choose the type' }]}
-            >
-              <Select placeholder="Please choose the type">
-                <Option value="private">Private</Option>
-                <Option value="public">Public</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="approver"
-              label="Approver"
-              rules={[
-                { required: true, message: 'Please choose the approver' }
-              ]}
-            >
-              <Select placeholder="Please choose the approver">
-                <Option value="jack">Jack Ma</Option>
-                <Option value="tom">Tom Liu</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="dateTime"
-              label="DateTime"
-              rules={[
-                { required: true, message: 'Please choose the dateTime' }
-              ]}
-            >
-              <DatePicker.RangePicker style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[
-                {
-                  required: true,
-                  message: 'please enter url description'
-                }
-              ]}
-            >
-              <Input.TextArea
-                rows={4}
-                placeholder="please enter url description"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
+      {visible && (
+        <FormEditDynamicFileds
+          tagList={tagList}
+          onFinsh={onFinsh}
+          defaultTagsValue={equipmentInfo}
+        />
+      )}
     </Drawer>
   );
 };

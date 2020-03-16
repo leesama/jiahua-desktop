@@ -1,4 +1,4 @@
-import { env } from '@/config';
+import { env } from '@/config/index';
 import getAccessToken from '../core/getAccessToken';
 import request from '../core/request';
 

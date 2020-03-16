@@ -1,6 +1,9 @@
 import { Form, Input, Select, Radio, Button, message, Switch } from 'antd';
 import React, { useEffect, useMemo, useCallback, useState } from 'react';
-import { getMaxTagWeight, createTag } from '../../models/tag';
+import {
+  getMaxEquipmentTagWeight,
+  creatEquipmentTag
+} from '../../models/equipment-tag';
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 }
@@ -8,11 +11,11 @@ const layout = {
 
 const TagAdd: React.FC = () => {
   const [form] = Form.useForm();
-  const [chooseTodayVisible, setChooseTodayVisible] = useState(false);
+  const [defaultTodayVisible, setDefaultTodayVisible] = useState(false);
   const onFinish = useCallback(async (values: FormValue) => {
     console.log(values);
 
-    const isOk = await createTag(values as TagItem);
+    const isOk = await creatEquipmentTag(values as TagItem);
     if (isOk) {
       message.success('标签添加成功');
       form.setFieldsValue({
@@ -22,7 +25,6 @@ const TagAdd: React.FC = () => {
         tagWeight: values.tagWeight + 100,
         tagRequire: true
       });
-      console.log(22);
     } else {
       message.error('标签添加失败');
     }
@@ -34,7 +36,7 @@ const TagAdd: React.FC = () => {
       tagValueList: [],
       timeTagChooseToday: true
     });
-    getMaxTagWeight().then(i =>
+    getMaxEquipmentTagWeight().then(i =>
       form.setFieldsValue({
         tagWeight: i
       })
@@ -42,8 +44,8 @@ const TagAdd: React.FC = () => {
   }, []);
   const tagTypeChange = (e: any) => {
     e.target.value === '时间'
-      ? setChooseTodayVisible(true)
-      : setChooseTodayVisible(false);
+      ? setDefaultTodayVisible(true)
+      : setDefaultTodayVisible(false);
   };
   return useMemo(
     () => (
@@ -70,13 +72,11 @@ const TagAdd: React.FC = () => {
             <Radio value="时间">时间</Radio>
           </Radio.Group>
         </Form.Item>
-        {chooseTodayVisible ? (
-          <Form.Item
-            label="是否默认选择当天"
-            valuePropName="checked"
-            name="timeTagChooseToday"
-          >
-            <Switch />
+        {defaultTodayVisible ? (
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 7 }}>
+            <span style={{ color: '#3e82db' }}>
+              时间类型值以填写当日日期作为默认值
+            </span>
           </Form.Item>
         ) : (
           <Form.Item label="标签数据可选项" style={{ marginBottom: 0 }}>
@@ -106,7 +106,7 @@ const TagAdd: React.FC = () => {
         </Form.Item>
       </Form>
     ),
-    [chooseTodayVisible]
+    [defaultTodayVisible]
   );
 };
 export default TagAdd;

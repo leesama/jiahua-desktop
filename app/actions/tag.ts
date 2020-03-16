@@ -1,4 +1,8 @@
-import { getTagList, updateTagById, deleteTagByid } from '../models/tag';
+import {
+  getEquipmentTagList,
+  updateEquipmentTagById,
+  deleteEquipmentTagByid
+} from '../models/equipment-tag';
 import { message } from 'antd';
 import { setSpin } from './common';
 
@@ -18,7 +22,7 @@ export const getTags = (callback?: () => void) => async (
 ) => {
   dispatch(setSpin(true));
   dispatch(setTags([]));
-  const data = await getTagList();
+  const data = await getEquipmentTagList();
   dispatch(setTags(data));
   callback && callback();
   dispatch(setSpin(false));
@@ -33,7 +37,7 @@ export const updateTags = (
   newData: TagItem[]
 ) => async (dispatch: Dispatch) => {
   dispatch(setTags(newData));
-  const isOk = await updateTagById(id, data);
+  const isOk = await updateEquipmentTagById(id, data);
   isOk ? message.success('数据修改成功') : message.error('数据修改失败');
 };
 /**
@@ -47,7 +51,7 @@ export const deleteTag = (id: string, tagList: TagItem[]) => async (
   const index = tagList.findIndex(i => i._id === id);
   tagList.splice(index, 1);
   dispatch(setTags(tagList));
-  const isOk = await deleteTagByid(id);
+  const isOk = await deleteEquipmentTagByid(id);
   isOk ? message.success('数据删除成功') : message.error('数据删除失败');
 };
 

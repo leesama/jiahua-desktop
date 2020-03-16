@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
   Tag,
@@ -22,12 +22,24 @@ interface EditableCellProps {
   editing: boolean;
   dataIndex: string;
   title: React.ReactNode;
-  inputType: 'number' | 'text' | 'array' | 'radioArray' | 'switch';
+  inputType:
+    | 'number'
+    | 'text'
+    | 'array'
+    | 'radioArray'
+    | 'switch'
+    | 'doubleTagValue'
+    | 'numberTagValue'
+    | 'timeTagValue'
+    | 'wordTagValue';
   record: TagItem;
   index: number;
   children: React.ReactNode;
 }
-
+type StoreValue = any;
+interface Store {
+  [name: string]: StoreValue;
+}
 const EditableCell: React.FC<EditableCellProps> = ({
   editing,
   dataIndex,
@@ -51,6 +63,40 @@ const EditableCell: React.FC<EditableCellProps> = ({
       inputNode = (
         <Form.Item name={dataIndex}>
           <Input />
+        </Form.Item>
+      );
+      break;
+    case 'doubleTagValue':
+      inputNode = (
+        <Form.Item
+          name={dataIndex}
+          rules={[{ type: 'float', message: `当前标签值必须数字类型` }]}
+        >
+          <Select mode="tags" />
+        </Form.Item>
+      );
+      break;
+    case 'numberTagValue':
+      inputNode = (
+        <Form.Item
+          name={dataIndex}
+          rules={[{ type: 'number', message: `当前标签值必须整数类型` }]}
+        >
+          <Select mode="tags" />
+        </Form.Item>
+      );
+      break;
+    case 'wordTagValue':
+      inputNode = (
+        <Form.Item name={dataIndex}>
+          <Select mode="tags" />
+        </Form.Item>
+      );
+      break;
+    case 'timeTagValue':
+      inputNode = (
+        <Form.Item>
+          <Button type="link">时间类型值以填写当日日期作为默认值</Button>
         </Form.Item>
       );
       break;
@@ -90,8 +136,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const TagMannage: React.FC = () => {
+  // 用useRef保存编辑之前的store数据，因为要通过改变store数据来切换组件
+  const stateBeforeEdit = useRef<TagItem[]>();
   const dispatch = useDispatch();
   const [editingKey, setEditingKey] = useState('');
+  const tagList = useSelector<StoreState, TagItem[]>(state => state.tag.tags);
+  const [form] = Form.useForm();
   useEffect(() => {
     dispatch(getTags());
     return () => {
@@ -99,16 +149,16 @@ const TagMannage: React.FC = () => {
       dispatch(setTags([]));
     };
   }, []);
-  const tagList = useSelector<StoreState, TagItem[]>(state => state.tag.tags);
-
-  const [form] = Form.useForm();
   const isEditing = (record: TagItem) => record.key === editingKey;
   const edit = (record: TagItem) => {
+    stateBeforeEdit.current = JSON.parse(JSON.stringify(tagList));
+    console.log(stateBeforeEdit.current, 111);
     form.setFieldsValue({ ...record });
     setEditingKey(record.key);
   };
 
   const cancel = () => {
+    stateBeforeEdit.current && dispatch(setTags(stateBeforeEdit.current));
     setEditingKey('');
   };
 
@@ -127,6 +177,7 @@ const TagMannage: React.FC = () => {
           ...item,
           ...row
         });
+        newData.sort((a, b) => a.tagWeight - b.tagWeight);
         dispatch(updateTags(item._id, row, newData));
         setEditingKey('');
       } else {
@@ -157,6 +208,7 @@ const TagMannage: React.FC = () => {
       dataIndex: 'tagValueList',
       key: 'tagValueList',
       render: (_text: string, record: TagItem) => {
+        if (record.tagType === '时间') return null;
         return record.tagValueList.length === 0 ? (
           <Tag
             color="gold"
@@ -257,7 +309,23 @@ const TagMannage: React.FC = () => {
             inputType = 'number';
             break;
           case 'tagValueList':
-            inputType = 'array';
+            switch (record.tagType) {
+              case '数字':
+                inputType = 'doubleTagValue';
+                break;
+              case '整数':
+                inputType = 'numberTagValue';
+                break;
+              case '文字':
+                inputType = 'wordTagValue';
+                break;
+              case '时间':
+                inputType = 'timeTagValue';
+                break;
+              default:
+                inputType = 'wordTagValue';
+                break;
+            }
             break;
           case 'tagType':
             inputType = 'radioArray';
@@ -279,10 +347,20 @@ const TagMannage: React.FC = () => {
       }
     };
   });
+  // 监听表单的单选框变化，变化后修改数据
+  const onValuesChange = (changedValues: Store, allValues: Store) => {
+    if (!changedValues.tagType) {
+      return;
+    }
+    tagList[tagList.findIndex(i => i.key === allValues.key)].tagType =
+      changedValues.tagType;
+    allValues.key;
+    dispatch(setTags([...tagList]));
+  };
   return (
     <div className={styles.tagMannage}>
       {/* {tagList} */}
-      <Form form={form} component={false}>
+      <Form form={form} component={false} onValuesChange={onValuesChange}>
         <Table
           components={components}
           bordered

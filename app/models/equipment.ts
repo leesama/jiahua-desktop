@@ -1,7 +1,9 @@
 import callCloudDB from '../utils/requests/handlers/callCloudDB';
 import { jsonstringify } from '../utils/util';
-import { getTagList } from './tag';
-
+import { getEquipmentTagList } from './equipment-tag';
+import moment from 'moment';
+import { momentFormat } from '../config';
+moment.locale('zh-cn');
 /**
  * 新增设备
  * @param equipmentInfo
@@ -29,7 +31,7 @@ export const getEquipmentListAndTableColumn = async (
 }> => {
   const [{ Total, data }, tagList] = await Promise.all([
     getEquipments(pageNum),
-    getTagList()
+    getEquipmentTagList()
   ]);
   let formHeader: TableItem[] = [];
   // 从tag中提取数据组成表头
@@ -41,6 +43,18 @@ export const getEquipmentListAndTableColumn = async (
       formHeader.push({ title: tagName, dataIndex: tagName, key });
     }
   }
+  console.log(formHeader);
+
+  // // 将时间标签数据转换格式
+  // // 时间标签数组
+  // const timeTagNameArr = tagList
+  //   .filter(i => i.tagType == '时间')
+  //   .map(i => i.tagName);
+  // for (const i of data) {
+  //   for (const j of timeTagNameArr) {
+  //     i[j] && (i[j] = moment(i[j]).format(momentFormat));
+  //   }
+  // }
   return { Total, data, formHeader, tagList };
 };
 
@@ -62,7 +76,5 @@ export const getEquipments = async (
     tagItem.key = tagItem._id;
     return tagItem;
   });
-  console.log(data);
-
   return { data, Total };
 };

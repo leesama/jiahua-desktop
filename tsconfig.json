@@ -21,8 +21,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "allowJs": true
+    "allowJs": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["app/*"]
+    }
   },
+  "include": ["./app"],
   "exclude": [
     "test",
     "release",
