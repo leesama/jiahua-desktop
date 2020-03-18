@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import FormEditDynamicFileds from '../common/form-edit-dynamic-fileds/form-edit-dynamic-fileds';
-import { getTags, setTags } from '@/actions/tag';
+import { getEquipmentTags, setEquipmentTags } from '@/actions/equipment-tag';
 import { useDispatch, useSelector } from 'react-redux';
 import { createEquipment } from '@/models/equipment';
 import { message } from 'antd';
@@ -8,9 +8,9 @@ const EquipmentAdd: React.FC = () => {
   const dispatch = useDispatch();
   const tagList = useSelector<StoreState, TagItem[]>(state => state.tag.tags);
   useEffect(() => {
-    dispatch(getTags());
+    dispatch(getEquipmentTags());
     return () => {
-      dispatch(setTags([]));
+      dispatch(setEquipmentTags([]));
     };
   }, []);
   const onFinsh = async (data: TableItem) => {

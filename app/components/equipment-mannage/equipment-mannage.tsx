@@ -1,28 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Tag,
-  Table,
-  Input,
-  InputNumber,
-  Form,
-  Button,
-  Select,
-  Popconfirm
-} from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Form, Button, Popconfirm, message } from 'antd';
 
 import styles from './equipment-mannage.less';
-import { getEquipmentListAndTableColumn } from '../../models/equipment';
+import {
+  getEquipmentListAndTableColumn,
+  deleteEquipmentByid,
+  updateEquipment
+} from '../../models/equipment';
 import { useDispatch } from 'react-redux';
 import { setSpin } from '../../actions/common';
 import EquipmentEdit from '../equipment-edit/equipment-edit';
-const { Option } = Select;
 
 let tagList: TagItem[] = [];
 const TagMannage: React.FC = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  // 需要编辑的项
+  // 编辑界面是否显示
   const [editVisible, setEditVisible] = useState<boolean>(false);
   // 设备列表数据
   const [equipmentList, setEquipmentList] = useState<TableItem[]>([]);
@@ -47,41 +41,51 @@ const TagMannage: React.FC = () => {
       }
     );
   };
+  // 编辑设备
   const edit = (record: TableItem) => {
     setEquipmentInfo(record);
     setEditVisible(true);
   };
-
+  // 删除设备
+  const deleteEquipment = async (id: string) => {
+    const isOk = await deleteEquipmentByid(id);
+    if (isOk) {
+      setEquipmentList(state => {
+        const stateTemp = [...state];
+        const index = stateTemp.findIndex(i => i._id === id);
+        stateTemp.splice(index, 1);
+        return stateTemp;
+      });
+      message.success('设备删除成功');
+      return true;
+    } else {
+      message.error('设备删除失败');
+      return false;
+    }
+  };
   const handlePageChange = (i: number) => {
     getData(i);
   };
   // 编辑完成
   const onConfirm = async (data: TableItem) => {
-    console.log(data);
+    const isOk = await updateEquipment(data);
+    if (isOk) {
+      setEquipmentList(state => {
+        const stateTemp = [...state];
+        const index = stateTemp.findIndex(i => i._id === data._id);
+        stateTemp[index] = data;
+        return stateTemp;
+      });
+      message.success('设备修改成功');
+      return true;
+    } else {
+      message.error('设备修改失败');
+      return false;
+    }
   };
   // 关闭编辑框
   const onClose = () => {
     setEditVisible(false);
-  };
-  const save = async (key: string) => {
-    try {
-      const row = (await form.validateFields()) as TableItem;
-      const newData = [...tagList];
-      const index = newData.findIndex(item => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row
-        });
-        dispatch(updateTags(item._id, row, newData));
-      } else {
-        newData.push(row);
-        // setData(newData)
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
   };
   const columns = [
     ...columnData,
@@ -104,14 +108,9 @@ const TagMannage: React.FC = () => {
               title="确定要删除吗?"
               okText="确定"
               cancelText="取消"
-              onConfirm={() => deleteT(record.key, tagList)}
+              onConfirm={() => deleteEquipment(record._id)}
             >
-              <Button
-                type="danger"
-                // onClick={() => deleteTag(record)}
-              >
-                删除
-              </Button>
+              <Button type="danger">删除</Button>
             </Popconfirm>
           </>
         );

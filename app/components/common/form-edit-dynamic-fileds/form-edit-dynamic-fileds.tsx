@@ -8,6 +8,7 @@ import React, {
 import { Form, Input, Radio, Button, InputNumber, DatePicker } from 'antd';
 import moment from 'moment';
 import { momentFormat } from '@/config';
+import styles from './form-edit-dynamic-fields.less';
 const formItemStyle = { width: 300 };
 const momentTime = moment();
 moment.locale();
@@ -17,19 +18,16 @@ const FormEditDynamicFileds: React.FC<{
   defaultTagsValue?: TableItem;
   onFinsh: (data: TableItem) => Promise<boolean>;
 }> = ({ tagList, defaultTagsValue, onFinsh }) => {
-  console.log(defaultTagsValue, 0);
   const [form] = Form.useForm();
   //记录 打开的自行填写的表单的key
   const [inputList, setInputList] = useState<string[]>([]);
   // 记录 输入了值的 自行填写表单的key
   const [inputHasValueList, setInputHasValueList] = useState<string[]>([]);
-  const [formatDefault, setFormatDefault] = useState<TableItem>();
   // 设置表单默认值 ,因为会用到form实例需要等表单渲染成功之后在执行，使用effect  tagList
   useEffect(() => {
     if (defaultTagsValue) {
       // 如果有默认值
       // 所有时间标签名组成的数组
-      console.log(defaultTagsValue, 1);
       const fieldsValue: TableItem = { ...defaultTagsValue };
       const timeTagNameArr = tagList
         .filter(i => i.tagType == '时间')
@@ -63,13 +61,20 @@ const FormEditDynamicFileds: React.FC<{
       form.setFieldsValue(timeFields);
     }
   }, [tagList]);
-
-  const onFinish = async (values: FormValue) => {
-    let data: {} = {};
+  const submit = () => {
+    form.submit();
+  };
+  const finish = async (values: FormValue) => {
+    // 绑定id信息
+    let data: TableItem = {};
+    if (defaultTagsValue) {
+      data._id = defaultTagsValue._id;
+    }
     // 筛选掉空数据
     for (let key in values) {
       values[key] && (data[key] = values[key]);
     }
+
     // 将有可选数据却要手动输入的表单的手动输入数据绑定到该表单上
     for (let key in data) {
       if (key.includes('custom')) {
@@ -281,7 +286,7 @@ const FormEditDynamicFileds: React.FC<{
     );
   };
 
-  const formItem = () =>
+  const formItems = () =>
     tagList.map(i => {
       if (i.tagType === '时间') return itemNotHasValueList(i);
       return i.tagValueList.length > 0
@@ -289,28 +294,29 @@ const FormEditDynamicFileds: React.FC<{
         : itemNotHasValueList(i);
     });
 
-  const formItems = () =>
-    tagList.length > 0 && (
-      <>
-        {formItem()}
-        <Form.Item wrapperCol={{ offset: 8 }}>
-          <Button type="primary" htmlType="submit" style={{ width: 200 }}>
-            确定
-          </Button>
-        </Form.Item>
-      </>
-    );
   return (
-    <Form
-      onFinish={onFinish}
-      form={form}
-      name="complex-form"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      style={{ marginTop: 20 }}
-    >
-      {formItems()}
-    </Form>
+    <div className={styles.formEdit}>
+      <Form
+        onFinish={finish}
+        form={form}
+        name="complex-form"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        style={{ marginTop: 20 }}
+      >
+        {tagList.length > 0 && formItems()}
+      </Form>
+      {tagList.length > 0 && (
+        <Button
+          type="primary"
+          onClick={submit}
+          htmlType="submit"
+          style={{ width: 200 }}
+        >
+          确定
+        </Button>
+      )}
+    </div>
   );
 };
 export default FormEditDynamicFileds;

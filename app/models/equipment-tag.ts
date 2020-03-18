@@ -48,14 +48,20 @@ export const getMaxEquipmentTagWeight = async (): Promise<string> => {
  * @param newTag
  */
 export const creatEquipmentTag = async (newTag: TagItem): Promise<boolean> => {
+  // 查重
   const checkHasExistQuery = `db.collection('equipment-tag').where({tagName:'${newTag.tagName}'}).limit(0).skip(1).get()`;
   const result = await callCloudDB('databasequery', checkHasExistQuery);
   if (result.data.length > 0) {
     return false;
   }
+  // 新增
+
+  // 如果tagValueList,添加一个空的tagValueList (针对于时间标签)
+  !newTag.tagValueList && (newTag.tagValueList = []);
   const query = `db.collection('equipment-tag').add({data:${jsonstringify(
     newTag
   )}})`;
+
   const { errcode } = await callCloudDB('databaseadd', query);
   return errcode === 0;
 };

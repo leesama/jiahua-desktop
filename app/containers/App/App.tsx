@@ -73,9 +73,9 @@ const App: React.FC<{ children: ReactNode }> = (props: Props) => {
             <PieChartOutlined />
             <span>录入设备</span>
           </Menu.Item>
-          <Menu.Item key="1">
+          <Menu.Item key="/equipmentStatistics">
             <PieChartOutlined />
-            <span>录入</span>
+            <span>设备统计</span>
           </Menu.Item>
           <SubMenu
             key="设备"

@@ -7,7 +7,7 @@ import { message } from 'antd';
 import { setSpin } from './common';
 
 // 设置标签
-export const setTags = (tagList: TagItem[]): SetTagAction => {
+export const setEquipmentTags = (tagList: TagItem[]): SetTagAction => {
   return {
     type: 'SET_TAG',
     data: tagList
@@ -17,13 +17,13 @@ export const setTags = (tagList: TagItem[]): SetTagAction => {
  *
  *
  */
-export const getTags = (callback?: () => void) => async (
+export const getEquipmentTags = (callback?: () => void) => async (
   dispatch: Dispatch
 ) => {
   dispatch(setSpin(true));
-  dispatch(setTags([]));
+  dispatch(setEquipmentTags([]));
   const data = await getEquipmentTagList();
-  dispatch(setTags(data));
+  dispatch(setEquipmentTags(data));
   callback && callback();
   dispatch(setSpin(false));
 };
@@ -36,7 +36,7 @@ export const updateTags = (
   data: TagItem,
   newData: TagItem[]
 ) => async (dispatch: Dispatch) => {
-  dispatch(setTags(newData));
+  dispatch(setEquipmentTags(newData));
   const isOk = await updateEquipmentTagById(id, data);
   isOk ? message.success('数据修改成功') : message.error('数据修改失败');
 };
@@ -50,7 +50,7 @@ export const deleteTag = (id: string, tagList: TagItem[]) => async (
 ) => {
   const index = tagList.findIndex(i => i._id === id);
   tagList.splice(index, 1);
-  dispatch(setTags(tagList));
+  dispatch(setEquipmentTags(tagList));
   const isOk = await deleteEquipmentTagByid(id);
   isOk ? message.success('数据删除成功') : message.error('数据删除失败');
 };

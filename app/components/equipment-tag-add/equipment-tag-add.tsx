@@ -4,6 +4,7 @@ import {
   getMaxEquipmentTagWeight,
   creatEquipmentTag
 } from '../../models/equipment-tag';
+import { isNumber } from '@/utils';
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 }
@@ -13,8 +14,6 @@ const TagAdd: React.FC = () => {
   const [form] = Form.useForm();
   const [defaultTodayVisible, setDefaultTodayVisible] = useState(false);
   const onFinish = useCallback(async (values: FormValue) => {
-    console.log(values);
-
     const isOk = await creatEquipmentTag(values as TagItem);
     if (isOk) {
       message.success('标签添加成功');
@@ -33,8 +32,7 @@ const TagAdd: React.FC = () => {
     form.setFieldsValue({
       tagType: '文字',
       tagRequire: true,
-      tagValueList: [],
-      timeTagChooseToday: true
+      tagValueList: []
     });
     getMaxEquipmentTagWeight().then(i =>
       form.setFieldsValue({
@@ -47,9 +45,14 @@ const TagAdd: React.FC = () => {
       ? setDefaultTodayVisible(true)
       : setDefaultTodayVisible(false);
   };
+  // 监听表单的单选框变化，变化后修改数据
+  // const onValuesChange = () => {
+  //   form.validateFields();
+  // };
   return useMemo(
     () => (
       <Form
+        // onValuesChange={onValuesChange}
         form={form}
         name="complex-form"
         onFinish={onFinish}
@@ -82,11 +85,29 @@ const TagAdd: React.FC = () => {
           <Form.Item label="标签数据可选项" style={{ marginBottom: 0 }}>
             <Form.Item
               name="tagValueList"
+              dependencies={['tagType']}
               style={{
                 display: 'inline-block',
                 width: 'calc(50% - 5px)',
                 marginRight: 8
               }}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(rule, value: []) {
+                    if (getFieldValue('tagType') === '整数') {
+                      return value.some(i => !/^\d+$/.test(i))
+                        ? Promise.reject('当前标签可选值必须为整数!')
+                        : Promise.resolve();
+                    }
+                    if (getFieldValue('tagType') === '数字') {
+                      return value.some(i => !isNumber(i))
+                        ? Promise.reject('当前标签可选值必须为数字!')
+                        : Promise.resolve();
+                    }
+                    return Promise.resolve();
+                  }
+                })
+              ]}
             >
               <Select mode="tags" />
             </Form.Item>

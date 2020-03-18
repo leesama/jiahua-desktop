@@ -12,10 +12,16 @@ import {
   Popconfirm,
   Switch
 } from 'antd';
-import styles from './tag-mannage.less';
+import styles from './equipment-tag-mannage.less';
 import { TableComponents } from '_rc-table@7.1.2@rc-table/lib/interface';
 import { useDispatch, useSelector } from 'react-redux';
-import { getTags, updateTags, deleteTag, setTags } from '../../actions/tag';
+import {
+  getEquipmentTags,
+  updateTags,
+  deleteTag,
+  setEquipmentTags
+} from '../../actions/equipment-tag';
+import { isNumber } from '@/utils';
 const signal = axios.CancelToken.source();
 const { Option } = Select;
 interface EditableCellProps {
@@ -28,10 +34,7 @@ interface EditableCellProps {
     | 'array'
     | 'radioArray'
     | 'switch'
-    | 'doubleTagValue'
-    | 'numberTagValue'
-    | 'timeTagValue'
-    | 'wordTagValue';
+    | 'timeTagValue';
   record: TagItem;
   index: number;
   children: React.ReactNode;
@@ -66,33 +69,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
         </Form.Item>
       );
       break;
-    case 'doubleTagValue':
-      inputNode = (
-        <Form.Item
-          name={dataIndex}
-          rules={[{ type: 'float', message: `当前标签值必须数字类型` }]}
-        >
-          <Select mode="tags" />
-        </Form.Item>
-      );
-      break;
-    case 'numberTagValue':
-      inputNode = (
-        <Form.Item
-          name={dataIndex}
-          rules={[{ type: 'number', message: `当前标签值必须整数类型` }]}
-        >
-          <Select mode="tags" />
-        </Form.Item>
-      );
-      break;
-    case 'wordTagValue':
-      inputNode = (
-        <Form.Item name={dataIndex}>
-          <Select mode="tags" />
-        </Form.Item>
-      );
-      break;
     case 'timeTagValue':
       inputNode = (
         <Form.Item>
@@ -102,7 +78,27 @@ const EditableCell: React.FC<EditableCellProps> = ({
       break;
     case 'array':
       inputNode = (
-        <Form.Item name={dataIndex}>
+        <Form.Item
+          name={dataIndex}
+          dependencies={['tagType']}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(rule, value: []) {
+                if (getFieldValue('tagType') === '整数') {
+                  return value.some(i => !/^\d+$/.test(i))
+                    ? Promise.reject('当前标签可选值必须为整数!')
+                    : Promise.resolve();
+                }
+                if (getFieldValue('tagType') === '数字') {
+                  return value.some(i => !isNumber(i))
+                    ? Promise.reject('当前标签可选值必须为数字!')
+                    : Promise.resolve();
+                }
+                return Promise.resolve();
+              }
+            })
+          ]}
+        >
           <Select mode="tags" />
         </Form.Item>
       );
@@ -143,10 +139,10 @@ const TagMannage: React.FC = () => {
   const tagList = useSelector<StoreState, TagItem[]>(state => state.tag.tags);
   const [form] = Form.useForm();
   useEffect(() => {
-    dispatch(getTags());
+    dispatch(getEquipmentTags());
     return () => {
       signal.cancel();
-      dispatch(setTags([]));
+      dispatch(setEquipmentTags([]));
     };
   }, []);
   const isEditing = (record: TagItem) => record.key === editingKey;
@@ -158,7 +154,8 @@ const TagMannage: React.FC = () => {
   };
 
   const cancel = () => {
-    stateBeforeEdit.current && dispatch(setTags(stateBeforeEdit.current));
+    stateBeforeEdit.current &&
+      dispatch(setEquipmentTags(stateBeforeEdit.current));
     setEditingKey('');
   };
 
@@ -309,23 +306,9 @@ const TagMannage: React.FC = () => {
             inputType = 'number';
             break;
           case 'tagValueList':
-            switch (record.tagType) {
-              case '数字':
-                inputType = 'doubleTagValue';
-                break;
-              case '整数':
-                inputType = 'numberTagValue';
-                break;
-              case '文字':
-                inputType = 'wordTagValue';
-                break;
-              case '时间':
-                inputType = 'timeTagValue';
-                break;
-              default:
-                inputType = 'wordTagValue';
-                break;
-            }
+            record.tagType === '时间'
+              ? (inputType = 'timeTagValue')
+              : (inputType = 'array');
             break;
           case 'tagType':
             inputType = 'radioArray';
@@ -355,22 +338,23 @@ const TagMannage: React.FC = () => {
     tagList[tagList.findIndex(i => i.key === allValues.key)].tagType =
       changedValues.tagType;
     allValues.key;
-    dispatch(setTags([...tagList]));
+    dispatch(setEquipmentTags([...tagList]));
   };
   return (
     <div className={styles.tagMannage}>
-      {/* {tagList} */}
       <Form form={form} component={false} onValuesChange={onValuesChange}>
-        <Table
-          components={components}
-          bordered
-          dataSource={tagList}
-          columns={mergedColumns}
-          rowClassName="editable-row"
-          pagination={{
-            onChange: cancel
-          }}
-        />
+        {tagList.length > 0 && (
+          <Table
+            components={components}
+            bordered
+            dataSource={tagList}
+            columns={mergedColumns}
+            rowClassName="editable-row"
+            pagination={{
+              onChange: cancel
+            }}
+          />
+        )}
       </Form>
     </div>
   );

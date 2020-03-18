@@ -34,7 +34,7 @@ export const getEquipmentListAndTableColumn = async (
     getEquipmentTagList()
   ]);
   let formHeader: TableItem[] = [];
-  // 从tag中提取数据组成表头
+  // 从tag中提取必填项数据组成表头
   for (let index = 0; index < tagList.length; index++) {
     if (formHeader.length > 7) break;
     const tagItem = tagList[index];
@@ -77,4 +77,21 @@ export const getEquipments = async (
     return tagItem;
   });
   return { data, Total };
+};
+
+/**
+ * 更新设备信息
+ */
+export const updateEquipment = async (newData: TableItem): Promise<boolean> => {
+  const query = `db.collection('equipment').doc('${
+    newData._id
+  }').update({data:${jsonstringify(newData)}})`;
+  const { errcode } = await callCloudDB('databaseupdate', query);
+  return errcode === 0;
+};
+
+export const deleteEquipmentByid = async (id: string): Promise<boolean> => {
+  const query = `db.collection('equipment').doc('${id}').remove()`;
+  const { errcode } = await callCloudDB('databasedelete', query);
+  return errcode === 0;
 };
