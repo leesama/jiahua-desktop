@@ -4,7 +4,9 @@ import { createHashHistory } from 'history';
 import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
-
+import * as commonActions from '../actions/common';
+import * as equipmentStatistics from '../actions/equipment-statistics';
+import * as equipmentTag from '../actions/equipment-tag';
 declare global {
   interface Window {
     __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: (
@@ -48,7 +50,10 @@ const configureStore = () => {
 
   // Redux DevTools Configuration
   const actionCreators = {
-    ...routerActions
+    ...routerActions,
+    ...equipmentTag,
+    ...commonActions,
+    ...equipmentStatistics
   };
   // If Redux DevTools Extension is installed use it, otherwise use Redux compose
   /* eslint-disable no-underscore-dangle */

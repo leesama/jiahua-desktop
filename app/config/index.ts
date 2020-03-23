@@ -1,4 +1,11 @@
-export const appid = 'wx8e100a9f3c9663b0';
-export const secret = '5f6c50a2cafcebc298b9775bbcc4c0b9';
-export const env = 'test-5bp3y';
+/*
+ * @Author: leecho
+ * @Date: 2020-03-07 12:54:21
+ * @LastEditors: leecho
+ * @LastEditTime: 2020-03-23 14:26:48
+ * @FilePath: \undefinede:\个人项目\jiahua-desktop\app\config\index.ts
+ */
+export const appid = '';
+export const secret = '';
+export const env = '';
 export const momentFormat = 'YYYY M/D  dddd k:mm';

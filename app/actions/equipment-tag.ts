@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-03-08 15:42:56
+ * @LastEditTime: 2020-03-23 14:19:14
+ * @LastEditors: leecho
+ * @Description: In User Settings Edit
+ * @FilePath: \jiahua-desktop\app\actions\equipment-tag.ts
+ */
 import {
   getEquipmentTagList,
   updateEquipmentTagById,
@@ -5,9 +13,8 @@ import {
 } from '../models/equipment-tag';
 import { message } from 'antd';
 import { setSpin } from './common';
-
 // 设置标签
-export const setEquipmentTags = (tagList: TagItem[]): SetTagAction => {
+export const setEquipmentTags = (tagList: TagItem[]): SetEquipmentTagAction => {
   return {
     type: 'SET_TAG',
     data: tagList
@@ -31,7 +38,7 @@ export const getEquipmentTags = (callback?: () => void) => async (
  * 更新标签
  * 更新store数据，更新数据库
  */
-export const updateTags = (
+export const updateEquipmentTags = (
   id: string,
   data: TagItem,
   newData: TagItem[]
@@ -45,7 +52,7 @@ export const updateTags = (
  * @param id
  * @param tagList
  */
-export const deleteTag = (id: string, tagList: TagItem[]) => async (
+export const deleteEquipmentTag = (id: string, tagList: TagItem[]) => async (
   dispatch: Dispatch
 ) => {
   const index = tagList.findIndex(i => i._id === id);
@@ -65,12 +72,12 @@ declare global {
     tagRequire: boolean;
     tagWeight: number;
   }
-  interface TagStates {
+  interface EquipmentTagState {
     tags: TagItem[];
   }
-  interface SetTagAction {
+  interface SetEquipmentTagAction {
     type: 'SET_TAG';
     data: TagItem[];
   }
-  type TagActions = SetTagAction;
+  type EquipmentTagActions = SetEquipmentTagAction;
 }

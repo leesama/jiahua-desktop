@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-03-08 22:59:20
+ * @LastEditTime: 2020-03-19 20:33:06
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \jiahua-desktop\app\models\equipment-tag.ts
+ */
 import callCloudDB from '../utils/requests/handlers/callCloudDB';
 import { jsonstringify } from '../utils/util';
 

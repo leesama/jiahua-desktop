@@ -1,9 +1,14 @@
+/*
+ * @Author: your name
+ * @Date: 2020-03-11 20:39:50
+ * @LastEditTime: 2020-03-20 11:19:10
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \jiahua-desktop\app\models\equipment.ts
+ */
 import callCloudDB from '../utils/requests/handlers/callCloudDB';
 import { jsonstringify } from '../utils/util';
 import { getEquipmentTagList } from './equipment-tag';
-import moment from 'moment';
-import { momentFormat } from '../config';
-moment.locale('zh-cn');
 /**
  * 新增设备
  * @param equipmentInfo
@@ -43,18 +48,6 @@ export const getEquipmentListAndTableColumn = async (
       formHeader.push({ title: tagName, dataIndex: tagName, key });
     }
   }
-  console.log(formHeader);
-
-  // // 将时间标签数据转换格式
-  // // 时间标签数组
-  // const timeTagNameArr = tagList
-  //   .filter(i => i.tagType == '时间')
-  //   .map(i => i.tagName);
-  // for (const i of data) {
-  //   for (const j of timeTagNameArr) {
-  //     i[j] && (i[j] = moment(i[j]).format(momentFormat));
-  //   }
-  // }
   return { Total, data, formHeader, tagList };
 };
 
@@ -89,9 +82,22 @@ export const updateEquipment = async (newData: TableItem): Promise<boolean> => {
   const { errcode } = await callCloudDB('databaseupdate', query);
   return errcode === 0;
 };
-
+/**
+ * 删除标签
+ * @param id
+ */
 export const deleteEquipmentByid = async (id: string): Promise<boolean> => {
   const query = `db.collection('equipment').doc('${id}').remove()`;
   const { errcode } = await callCloudDB('databasedelete', query);
   return errcode === 0;
+};
+/**
+ * 根据标签名获取聚合分组标签信息
+ */
+export const getGroupInfoByTagName = async (
+  tagName: string
+): Promise<boolean> => {
+  const query = `db.collection('equipment').aggregate().group({_id: '$${tagName}',count: $.sum(1),tagGroup: $.push('$$ROOT')}).end()`;
+  const { data } = await callCloudDB('databaseaggregate', query);
+  return data.map((i: string) => JSON.parse(i));
 };

@@ -1,4 +1,4 @@
-const initState = { spinning: false };
+const initState: CommonState = { spinning: false };
 export default (state = initState, action: CommonActions): CommonState => {
   switch (action.type) {
     case 'SET_SPIN':

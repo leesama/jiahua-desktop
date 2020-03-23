@@ -1,17 +1,19 @@
-import React, {
-  useEffect,
-  useState,
-  Fragment,
-  useCallback,
-  useMemo
-} from 'react';
+/*
+ * @Author: your name
+ * @Date: 2020-03-15 18:34:38
+ * @LastEditTime: 2020-03-19 21:51:40
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \jiahua-desktop\app\components\common\form-edit-dynamic-fileds\form-edit-dynamic-fileds.tsx
+ */
+import React, { useEffect, useState, Fragment, useCallback } from 'react';
 import { Form, Input, Radio, Button, InputNumber, DatePicker } from 'antd';
 import moment from 'moment';
 import { momentFormat } from '@/config';
 import styles from './form-edit-dynamic-fields.less';
 const formItemStyle = { width: 300 };
 const momentTime = moment();
-moment.locale();
+moment.locale('zh-cn');
 let timeFields = {};
 const FormEditDynamicFileds: React.FC<{
   tagList: TagItem[];
