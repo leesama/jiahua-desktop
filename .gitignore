@@ -49,3 +49,6 @@ npm-debug.log.*
 *.sass.d.ts
 *.scss.d.ts
 *.less.d.ts
+
+# core
+app/config
